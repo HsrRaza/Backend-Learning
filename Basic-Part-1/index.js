@@ -1,5 +1,10 @@
 import express from "express"
 import dotenv from "dotenv";
+import cors from "cors";
+import db from "./utils/db.utils.js"
+
+
+
 
 dotenv.config();
 
@@ -24,7 +29,9 @@ app.get('/', (req, res)=>{
     res.send("Home Page")
 })
 
+// connect to db
 
+db();
 
 app.listen(port , ()=>{
     console.log(`Example app listening on port ${port}`);
