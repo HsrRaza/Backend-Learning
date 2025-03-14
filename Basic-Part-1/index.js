@@ -9,7 +9,7 @@ import db from "./utils/db.utils.js"
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT
+const port = process.env.PORT || 4000;
 
 
 app.use(
@@ -21,7 +21,7 @@ app.use(
     })
 );
 app.use(express.json());
-app.use(express.urlencoded( { extended: true}))
+app.use(express.urlencoded( { extended: true}));
 
 
 
@@ -36,4 +36,4 @@ db();
 app.listen(port , ()=>{
     console.log(`Example app listening on port ${port}`);
     
-})
+});
