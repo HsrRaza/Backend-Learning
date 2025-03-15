@@ -1,6 +1,7 @@
 import User from "../model/user.model.js"
 import crypto from "crypto";
-import nodemailer from "nodemailer"
+import nodemailer from "nodemailer";
+import bcrypt from "bcryptjs";
 
 const registerUser = async (req, res) => {
     // get data
@@ -113,17 +114,17 @@ const verifyUser = async (req, res) => {
     // return res
 
     const { token } = req.params;
-    if(!token){
+    if (!token) {
         return res.status(400).json({
-            msg : "Invalid token"
+            msg: "Invalid token"
         });
     };
 
-  const user = await User.findOne({ verificationToken: token })
+    const user = await User.findOne({ verificationToken: token })
 
-    if(!user){
+    if (!user) {
         return res.status(400).json({
-            msg : "Invalid token"
+            msg: "Invalid token"
         });
     };
 
@@ -137,8 +138,46 @@ const verifyUser = async (req, res) => {
 }
 
 
+const login = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({
+            msg: "All fields are required "
+        })
+    }
+
+    try {
+
+        const user = await User.findOne({ email })
+        if (!user) {
+            return res.status(400).json({
+                msg: " Inavlid email or password ",
+            })
+        }
+
+       const isMatch = await bcrypt.compare(password,user.password)
+
+       console.log(isMatch);
+       
+  
+       if (!isMatch) {
+        return res.status(400).json({
+            msg: " Inavlid email or password ",
+        })
+    }
 
 
+
+
+    } catch (error) {
+        return res.status(404).json({
+            msg: "Unable lo login",
+        })
+
+    }
+
+}
 
 
 
