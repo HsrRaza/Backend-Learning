@@ -2,6 +2,8 @@ import User from "../model/user.model.js"
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken"
+
 
 const registerUser = async (req, res) => {
     // get data
@@ -46,7 +48,7 @@ const registerUser = async (req, res) => {
             password
         })
 
-        console.log(user);
+        // console.log(user);
 
 
         if (!user) {
@@ -62,7 +64,12 @@ const registerUser = async (req, res) => {
 
         await user.save()
 
-        //    send email
+        // res.status(201).json({
+        //     msg: "User registered successfully",
+        //     sucess: true,
+        // })
+
+        //    sendemail
         const transporter = nodemailer.createTransport({
             host: process.env.MAILTRAP_HOST,
             port: process.env.MAILTRAP_PORT,
@@ -78,17 +85,19 @@ const registerUser = async (req, res) => {
             to: user.email, // list of receivers
             subject: "Verify your email ✔", // Subject line
             text: `please Click on the following link
-            ${process.env.BASE_URL}/api/v1/users/verfiy${token}
+            ${process.env.BASE_URL}/api/v1/users/verify/${token}
             `,
         };
 
 
-        await transporter.sendMail(mailOption);
+       const info =   transporter.sendMail(mailOption);
+       console.log("Email sent:", info.response);
 
         res.status(201).json({
             msg: "User registered successfully",
             sucess: true,
         })
+
 
 
 
@@ -156,16 +165,49 @@ const login = async (req, res) => {
             })
         }
 
-       const isMatch = await bcrypt.compare(password,user.password)
+        const isMatch = await bcrypt.compare(password, user.password)
 
-       console.log(isMatch);
-       
-  
-       if (!isMatch) {
-        return res.status(400).json({
-            msg: " Inavlid email or password ",
-        })
-    }
+        console.log(isMatch);
+
+
+        if (!isMatch) {
+            return res.status(400).json({
+                msg: " Inavlid email or password ",
+            })
+
+        }
+        if (!user.isVerified) {
+            return res.status(400).json({
+                msg: "Please Verify your email"
+            })
+        }
+
+
+
+        const token = jwt.sign({ id: user._id, role: user.role },
+            "shhhhh", {
+            expiresIn: '24h'
+        }
+        );
+
+        const cookieOptions = {
+            httpOnly: true,
+            secure: true,
+            maxAge: 24 * 60 * 50 * 1000
+        }
+
+        res.cookie("token", token, cookieOptions)
+
+        res.status(200).json({
+            success: true,
+            message: "login successful",
+            token,
+            user: {
+                id: user._id,
+                name: user.name,
+                role: user.role
+            }
+        });
 
 
 
@@ -181,4 +223,4 @@ const login = async (req, res) => {
 
 
 
-export { registerUser, verifyUser }
+export { registerUser, verifyUser, login }
