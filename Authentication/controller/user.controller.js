@@ -1,8 +1,11 @@
+import dotenv from "dotenv"
 import User from "../model/user.model.js"
 import crypto from "crypto";
 import nodemailer from "nodemailer";
 import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken"
+import jwt from "jsonwebtoken";
+
+dotenv.config();
 
 
 const registerUser = async (req, res) => {
@@ -48,7 +51,7 @@ const registerUser = async (req, res) => {
             password
         })
 
-        // console.log(user);
+        console.log(user);
 
 
         if (!user) {
@@ -64,33 +67,38 @@ const registerUser = async (req, res) => {
 
         await user.save()
 
+        // console.log("MAILTRAP_HOST:", process.env.MAILTRAP_HOST);
+        // console.log("MAILTRAP_USERNAME:", process.env.MAILTRAP_USERNAME);
+        // console.log("MAILTRAP_PASSWORD:", process.env.MAILTRAP_PASSWORD ? "Loaded" : "Not Loaded");
+        
 
         //    sendemail
-        const transporter = nodemailer.createTransport({
-            host:  process.env.MAILTRAP_HOST,
-            port: process.env.MAILTRAP_PORT,
-            secure: false, // true for port 465, false for other ports 
-            auth: {
-                user: process.env.MAILTRAP_USERNAME,
-                pass:  process.env.MAILTRAP_PASSWORD ,
-            }
-        })
-async function main() {
+    //     const transporter = nodemailer.createTransport({
+    //         host: sandbox.smtp.mailtrap.io ,
+    //         port: 587,
+    //         secure: false, // true for port 465, false for other ports 
+    //         auth: {
+    //             user: "d94b9ee7102268",
+    //             pass:  "********4006"
+    //         }
+    //     })
     
-    const mailOption = {
-        from: process.env.MAILTRAP_SENDEREMAIL, // sender address
-        to: user.email, // list of receivers
-        subject: "Verify your email ✔", // Subject line
-        text: `please Click on the following link
-        ${process.env.BASE_URL}/api/v1/users/verify/${token}
-        `,
-    };
+    // const mailOption = {
+    //     from: process.env.MAILTRAP_SENDEREMAIL, // sender address
+    //     to: user.email, // list of receivers
+    //     subject: "Verify your email ✔", // Subject line
+    //     text: `please Click on the following link
+    //     ${process.env.BASE_URL}${process.env.PORT}/api/v1/users/verify/${token}
+    //     `,
+    // };
     
     
-    const info =   transporter.sendMail(mailOption);
-    console.log("Email sent:", info.response);
-}
-main().catch(console.error)
+    //   transporter.sendMail(mailOption)
+    //   .then(info => console.log("Email sent success", info.response))
+    //   .catch(error => console.error("Error sending email", error))
+     
+   
+
 
         res.status(201).json({
             msg: "User registered successfully",
@@ -128,7 +136,11 @@ const verifyUser = async (req, res) => {
         });
     };
 
-    const user = await User.findOne({ verificationToken: token })
+    try {
+        console.log("Verification started ");
+        
+        
+        const user = await User.findOne({ verificationToken: token })
 
     if (!user) {
         return res.status(400).json({
@@ -141,6 +153,20 @@ const verifyUser = async (req, res) => {
 
     await user.save();
 
+    res.status(200).json({
+        msg: "User verified successfully",
+        success: true,
+    })
+
+    } catch (error) {
+        res.status(400).json({
+            error,
+            msg:"unable to verify token",
+            success: false,
+        })
+    }
+
+    
 
 
 }
