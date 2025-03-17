@@ -250,7 +250,7 @@ const login = async (req, res) => {
 
 const getMe = async (req, res) => {
     try {
-        console.log("reached at profile level ");
+      const user = await   User.findById(req.user.id).select('-password')
         
     } catch (error) {
         res.status(400).json({
