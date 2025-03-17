@@ -70,34 +70,34 @@ const registerUser = async (req, res) => {
         // console.log("MAILTRAP_HOST:", process.env.MAILTRAP_HOST);
         // console.log("MAILTRAP_USERNAME:", process.env.MAILTRAP_USERNAME);
         // console.log("MAILTRAP_PASSWORD:", process.env.MAILTRAP_PASSWORD ? "Loaded" : "Not Loaded");
-        
+
 
         //    sendemail
-    //     const transporter = nodemailer.createTransport({
-    //         host: sandbox.smtp.mailtrap.io ,
-    //         port: 587,
-    //         secure: false, // true for port 465, false for other ports 
-    //         auth: {
-    //             user: "d94b9ee7102268",
-    //             pass:  "********4006"
-    //         }
-    //     })
-    
-    // const mailOption = {
-    //     from: process.env.MAILTRAP_SENDEREMAIL, // sender address
-    //     to: user.email, // list of receivers
-    //     subject: "Verify your email ✔", // Subject line
-    //     text: `please Click on the following link
-    //     ${process.env.BASE_URL}${process.env.PORT}/api/v1/users/verify/${token}
-    //     `,
-    // };
-    
-    
-    //   transporter.sendMail(mailOption)
-    //   .then(info => console.log("Email sent success", info.response))
-    //   .catch(error => console.error("Error sending email", error))
-     
-   
+        //     const transporter = nodemailer.createTransport({
+        //         host: sandbox.smtp.mailtrap.io ,
+        //         port: 587,
+        //         secure: false, // true for port 465, false for other ports 
+        //         auth: {
+        //             user: "d94b9ee7102268",
+        //             pass:  "********4006"
+        //         }
+        //     })
+
+        // const mailOption = {
+        //     from: process.env.MAILTRAP_SENDEREMAIL, // sender address
+        //     to: user.email, // list of receivers
+        //     subject: "Verify your email ✔", // Subject line
+        //     text: `please Click on the following link
+        //     ${process.env.BASE_URL}${process.env.PORT}/api/v1/users/verify/${token}
+        //     `,
+        // };
+
+
+        //   transporter.sendMail(mailOption)
+        //   .then(info => console.log("Email sent success", info.response))
+        //   .catch(error => console.error("Error sending email", error))
+
+
 
 
         res.status(201).json({
@@ -138,35 +138,35 @@ const verifyUser = async (req, res) => {
 
     try {
         console.log("Verification started ");
-        
-        
+
+
         const user = await User.findOne({ verificationToken: token })
 
-    if (!user) {
-        return res.status(400).json({
-            msg: "Invalid token"
-        });
-    };
+        if (!user) {
+            return res.status(400).json({
+                msg: "Invalid token"
+            });
+        };
 
-    user.isVerified = true;
-    user.verificationToken = undefined;
+        user.isVerified = true;
+        user.verificationToken = undefined;
 
-    await user.save();
+        await user.save();
 
-    res.status(200).json({
-        msg: "User verified successfully",
-        success: true,
-    })
+        res.status(200).json({
+            msg: "User verified successfully",
+            success: true,
+        })
 
     } catch (error) {
         res.status(400).json({
             error,
-            msg:"unable to verify token",
+            msg: "unable to verify token",
             success: false,
         })
     }
 
-    
+
 
 
 }
@@ -190,14 +190,14 @@ const login = async (req, res) => {
             })
         }
 
-        const isMatch = await bcrypt.compare(password, user.password)
+        const isMatch =  bcrypt.compare(password, user.password)
 
-        console.log(isMatch);
+        // console.log(isMatch);
 
 
         if (!isMatch) {
             return res.status(400).json({
-                msg: " Inavlid email or password ",
+                msg: " unable to match",
             })
 
         }
@@ -210,7 +210,8 @@ const login = async (req, res) => {
 
 
         const token = jwt.sign({ id: user._id, role: user.role },
-            "shhhhh", {
+            process.env.JWT_SECRET ,
+            {
             expiresIn: '24h'
         }
         );
@@ -247,5 +248,51 @@ const login = async (req, res) => {
 }
 
 
+const getMe = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        res.status(400).json({
+            msg: "Unable to GetME",
+            success: false,
+        })
+        
+    }
+}
+const logoutUser = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        res.status(400).json({
+            msg: "Unable to GetME",
+            success: false,
+        })
+        
+    }
+}
+const forgetPassword = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        res.status(400).json({
+            msg: "Unable to  forgetPassword",
+            success: false,
+        })
+        
+    }
+}
+const resetPassword = async (req, res) => {
+    try {
+        
+    } catch (error) {
+        res.status(400).json({
+            msg: "Unable to resetPassword",
+            success: false,
+        })
+        
+    }
+}
 
-export { registerUser, verifyUser, login }
+
+
+export { registerUser, verifyUser, login , getMe, logoutUser,forgetPassword, resetPassword }
