@@ -272,7 +272,8 @@ const getMe = async (req, res) => {
         console.log("got User");
 
     } catch (error) {
-        return res.status(400).json({
+        console.log("Error in Get me");
+         res.status(400).json({
             msg: "Unable to Getme",
             success: false,
         });
