@@ -190,7 +190,7 @@ const login = async (req, res) => {
             })
         }
 
-        const isMatch =  bcrypt.compare(password, user.password)
+        const isMatch = bcrypt.compare(password, user.password)
 
         // console.log(isMatch);
 
@@ -210,10 +210,10 @@ const login = async (req, res) => {
 
 
         const token = jwt.sign({ id: user._id, role: user.role },
-            process.env.JWT_SECRET ,
+            process.env.JWT_SECRET,
             {
-            expiresIn: '24h'
-        }
+                expiresIn: '24h'
+            }
         );
 
         const cookieOptions = {
@@ -250,50 +250,103 @@ const login = async (req, res) => {
 
 const getMe = async (req, res) => {
     try {
-      const user = await   User.findById(req.user.id).select('-password')
-        
+
+        console.log("reached at get me");
+
+        const user = await User.findById(req.user.id).select('-password');
+        console.log(user);
+
+
+        if (!user) {
+            return res.status(400).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+
+        res.status(200).json({
+            success: true,
+            user,
+        });
+        console.log("got User");
+
     } catch (error) {
-        res.status(400).json({
-            msg: "Unable to GetME",
+        return res.status(400).json({
+            msg: "Unable to Getme",
             success: false,
-        })
-        
+        });
     }
+
 }
 const logoutUser = async (req, res) => {
     try {
-        
+
+        res.cookie('token', '', {});
+
+        res.status(200).json({
+            success: true,
+            msg: "logged Out Successfully"
+
+        })
+
+
     } catch (error) {
         res.status(400).json({
             msg: "Unable to GetME",
             success: false,
         })
-        
+
     }
 }
 const forgetPassword = async (req, res) => {
     try {
-        
+    //get email
+   //find user based on email
+  // reset token + reset expiry =>  Date.now() *10 *60* 100 => user.save()
+  //send mail => design url
+
+    
+    
     } catch (error) {
         res.status(400).json({
             msg: "Unable to  forgetPassword",
             success: false,
         })
-        
+
     }
 }
 const resetPassword = async (req, res) => {
     try {
-        
+        // collect token from params
+        // password from req.body
+        //
+
+        const {token}= req.params
+        const {password}= req.body
+        try {
+         const user =  await  User.findOne({
+                resetPassword: token,
+                resetPasswordExpires:{$gt: Date.now()}
+            })
+
+            // set Password in user
+            //resetToken , resetExpiry  => reset
+            // save
+            
+        } catch (error) {
+            
+        }
+
     } catch (error) {
         res.status(400).json({
             msg: "Unable to resetPassword",
             success: false,
         })
-        
+
     }
 }
 
 
 
-export { registerUser, verifyUser, login , getMe, logoutUser,forgetPassword, resetPassword }
+export { registerUser, verifyUser, login, getMe, logoutUser, forgetPassword, resetPassword }

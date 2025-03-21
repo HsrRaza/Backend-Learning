@@ -10,7 +10,7 @@ export const isLoggedIn = async (req, res, next) => {
     try {
         console.log(req.cookies);
 
-        let token = req.cookies?.token
+        let token = req.cookies?.token  // ?optinal chaining
         console.log("tojken found :" , token ? "YES" : "No" );
 
 
@@ -29,12 +29,7 @@ export const isLoggedIn = async (req, res, next) => {
       req.user = decoded
 
       next()
-
-
-        
-        
-        
-        
+    
     } catch (error) {
         console.log("auth middleware failed");
         
