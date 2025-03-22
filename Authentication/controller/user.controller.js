@@ -269,7 +269,7 @@ const getMe = async (req, res) => {
             success: true,
             user,
         });
-        console.log("got User");
+        // console.log("got User");
 
     } catch (error) {
         console.log("Error in Get me");
@@ -324,7 +324,7 @@ const resetPassword = async (req, res) => {
         //
 
         const {token}= req.params
-        const {password}= req.body
+        const {password, confPassword}= req.body
         try {
          const user =  await  User.findOne({
                 resetPassword: token,
